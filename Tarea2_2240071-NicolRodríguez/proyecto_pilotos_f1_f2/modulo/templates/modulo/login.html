@@ -1,0 +1,46 @@
+{% extends 'modulo/base.html' %}
+
+{% block title %}Iniciar sesión | Paddock{% endblock %}
+
+{% block content %}
+    <section class="login-card">
+        <p class="eyebrow">ACCESO AL SISTEMA</p>
+        <h1>Bienvenido al paddock.</h1>
+        <p>Inicia sesión para administrar tus perfiles de pilotos.</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="form-errors">
+                    El usuario o la contraseña no son correctos.
+                </div>
+            {% endif %}
+
+            <div class="form-field">
+                <label for="id_username">Usuario</label>
+                <input
+                    id="id_username"
+                    type="text"
+                    name="username"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="form-field">
+                <label for="id_password">Contraseña</label>
+                <input
+                    id="id_password"
+                    type="password"
+                    name="password"
+                    required
+                >
+            </div>
+
+            <button class="button button-dark button-full" type="submit">
+                Iniciar sesión
+            </button>
+        </form>
+    </section>
+{% endblock %}

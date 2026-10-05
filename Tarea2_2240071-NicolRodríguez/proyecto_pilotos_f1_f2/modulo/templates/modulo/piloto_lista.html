@@ -1,0 +1,210 @@
+{% extends 'modulo/base.html' %}
+{% load static %}
+
+{% block title %}Pilotos | Paddock{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <div>
+            <p class="eyebrow">TEMPORADA · MOTORSPORT</p>
+            <h1>
+                La parrilla,<br>
+                <em>piloto por piloto.</em>
+            </h1>
+            <p class="hero-copy">
+                Explora, organiza y administra los perfiles de la Fórmula 1 y Fórmula 2.
+            </p>
+        </div>
+
+        <div class="hero-number">
+            <strong>{{ total_filtrado|stringformat:"02d" }}</strong>
+            <span>
+                PILOTOS<br>
+                EN RESULTADOS
+            </span>
+        </div>
+    </section>
+
+    <section class="toolbar">
+        <form method="get" class="filters">
+            <div class="search-wrap">
+                <label for="q">BUSCAR</label>
+                <input
+                    id="q"
+                    type="search"
+                    name="q"
+                    value="{{ busqueda }}"
+                    placeholder="Nombre, nacionalidad o escudería"
+                >
+            </div>
+
+            <div>
+                <label for="categoria">CATEGORÍA</label>
+                <select id="categoria" name="categoria">
+                    <option value="">Todas</option>
+                    <option
+                        value="F1"
+                        {% if categoria_seleccionada == 'F1' %}selected{% endif %}
+                    >
+                        Fórmula 1
+                    </option>
+                    <option
+                        value="F2"
+                        {% if categoria_seleccionada == 'F2' %}selected{% endif %}
+                    >
+                        Fórmula 2
+                    </option>
+                </select>
+            </div>
+
+            <div>
+                <label for="escuderia">ESCUDERÍA</label>
+                <input
+                    id="escuderia"
+                    name="escuderia"
+                    value="{{ escuderia_seleccionada }}"
+                    list="lista-escuderias"
+                    placeholder="Todas las escuderías"
+                >
+                <datalist id="lista-escuderias">
+                    {% for nombre in escuderias %}
+                        <option value="{{ nombre }}">
+                    {% endfor %}
+                </datalist>
+            </div>
+
+            <button class="button button-dark" type="submit">
+                Aplicar filtros
+            </button>
+            <a class="reset-link" href="{% url 'piloto_lista' %}">
+                Limpiar
+            </a>
+        </form>
+    </section>
+
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">DIRECTORIO DE PILOTOS</p>
+            <h2>
+                Todos los perfiles
+                <span>({{ total_filtrado }})</span>
+            </h2>
+        </div>
+        <span class="page-note">
+            Página {{ pagina.number }} de {{ pagina.paginator.num_pages|default:1 }}
+        </span>
+    </div>
+
+    {% if pagina.object_list %}
+        <div class="pilot-grid">
+            {% for piloto in pagina %}
+                <article class="pilot-card">
+                    <a
+                        class="card-image"
+                        href="{% url 'piloto_detalle' piloto.pk %}"
+                    >
+                        {% if piloto.imagen %}
+                            <img
+                                src="{% static 'modulo/img/' %}{{ piloto.imagen|urlencode }}"
+                                alt="Retrato de {{ piloto.nombre }}"
+                                onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"
+                            >
+                        {% endif %}
+
+                        <div
+                            class="image-fallback"
+                            {% if piloto.imagen %}style="display:none"{% endif %}
+                        >
+                            <span>{{ piloto.nombre|first|upper }}</span>
+                        </div>
+
+                        <span class="category-pill {{ piloto.categoria|lower }}">
+                            {{ piloto.get_categoria_display }}
+                        </span>
+                    </a>
+
+                    <div class="card-body">
+                        <p class="team-line">
+                            <span></span>
+                            {{ piloto.escuderia }}
+                        </p>
+
+                        <h3>
+                            <a href="{% url 'piloto_detalle' piloto.pk %}">
+                                {{ piloto.nombre }}
+                            </a>
+                        </h3>
+
+                        <div class="card-meta">
+                            <span>
+                                <small>EDAD</small>
+                                {{ piloto.edad }} años
+                            </span>
+                            <span>
+                                <small>NACIONALIDAD</small>
+                                {{ piloto.nacionalidad }}
+                            </span>
+                        </div>
+
+                        <div class="card-bottom">
+                            <span>DEBUT · {{ piloto.anio_debut }}</span>
+                            <a
+                                href="{% url 'piloto_detalle' piloto.pk %}"
+                                aria-label="Ver {{ piloto.nombre }}"
+                            >
+                                ↗
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        <nav class="pagination" aria-label="Paginación">
+            {% if pagina.has_previous %}
+                <a
+                    href="?q={{ busqueda|urlencode }}&categoria={{ categoria_seleccionada|urlencode }}&escuderia={{ escuderia_seleccionada|urlencode }}&page={{ pagina.previous_page_number }}"
+                >
+                    ← Anterior
+                </a>
+            {% else %}
+                <span class="disabled">← Anterior</span>
+            {% endif %}
+
+            <div>
+                {% for numero in pagina.paginator.page_range %}
+                    {% if numero == pagina.number %}
+                        <span class="current">{{ numero }}</span>
+                    {% elif numero >= pagina.number|add:'-2' and numero <= pagina.number|add:'2' %}
+                        <a
+                            href="?q={{ busqueda|urlencode }}&categoria={{ categoria_seleccionada|urlencode }}&escuderia={{ escuderia_seleccionada|urlencode }}&page={{ numero }}"
+                        >
+                            {{ numero }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if pagina.has_next %}
+                <a
+                    href="?q={{ busqueda|urlencode }}&categoria={{ categoria_seleccionada|urlencode }}&escuderia={{ escuderia_seleccionada|urlencode }}&page={{ pagina.next_page_number }}"
+                >
+                    Siguiente →
+                </a>
+            {% else %}
+                <span class="disabled">Siguiente →</span>
+            {% endif %}
+        </nav>
+    {% else %}
+        <div class="empty-state">
+            <span>⌕</span>
+            <h3>No encontramos pilotos</h3>
+            <p>
+                Prueba con otro nombre o cambia los filtros seleccionados.
+            </p>
+            <a class="button button-dark" href="{% url 'piloto_lista' %}">
+                Ver todos los pilotos
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

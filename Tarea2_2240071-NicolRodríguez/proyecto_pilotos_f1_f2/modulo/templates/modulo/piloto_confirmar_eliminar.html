@@ -1,0 +1,30 @@
+{% extends 'modulo/base.html' %}
+
+{% block title %}Eliminar piloto | Paddock{% endblock %}
+
+{% block content %}
+    <section class="confirm-card">
+        <div class="warning-icon">!</div>
+        <p class="eyebrow">CONFIRMAR ACCIÓN</p>
+        <h1>¿Eliminar este piloto?</h1>
+        <p>
+            Vas a eliminar el perfil de <strong>{{ piloto.nombre }}</strong>.
+            Esta acción no se puede deshacer.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="action-row">
+                <button class="button button-danger" type="submit">
+                    Sí, eliminar
+                </button>
+                <a
+                    class="button button-light"
+                    href="{% url 'piloto_detalle' piloto.pk %}"
+                >
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'modulo/base.html' %}
+{% load static %}
+
+{% block title %}{{ piloto.nombre }} | Paddock{% endblock %}
+
+{% block content %}
+    <a class="back-link" href="{% url 'piloto_lista' %}">
+        ← Volver al directorio
+    </a>
+
+    <section class="detail-layout">
+        <div class="detail-image">
+            {% if piloto.imagen %}
+                <img
+                    src="{% static 'modulo/img/' %}{{ piloto.imagen|urlencode }}"
+                    alt="Retrato de {{ piloto.nombre }}"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"
+                >
+            {% endif %}
+
+            <div
+                class="image-fallback"
+                {% if piloto.imagen %}style="display:none"{% endif %}
+            >
+                <span>{{ piloto.nombre|first|upper }}</span>
+            </div>
+
+            <span class="category-pill {{ piloto.categoria|lower }}">
+                {{ piloto.get_categoria_display }}
+            </span>
+        </div>
+
+        <div class="detail-content">
+            <p class="eyebrow">
+                PERFIL DEL PILOTO · {{ piloto.anio_debut }}
+            </p>
+            <h1>{{ piloto.nombre }}</h1>
+            <p class="detail-team">
+                {{ piloto.escuderia }} · {{ piloto.nacionalidad }}
+            </p>
+
+            <div class="stats-row">
+                <div>
+                    <small>EDAD</small>
+                    <strong>{{ piloto.edad }} <i>años</i></strong>
+                </div>
+                <div>
+                    <small>CATEGORÍA</small>
+                    <strong>{{ piloto.categoria }}</strong>
+                </div>
+                <div>
+                    <small>AÑO DE DEBUT</small>
+                    <strong>{{ piloto.anio_debut }}</strong>
+                </div>
+            </div>
+
+            <h2>Sobre el piloto</h2>
+            <p class="description">
+                {{ piloto.descripcion|linebreaksbr }}
+            </p>
+
+            <div class="action-row">
+                <a
+                    class="button button-dark"
+                    href="{% url 'piloto_editar' piloto.pk %}"
+                >
+                    Editar perfil
+                </a>
+                <a
+                    class="button button-danger-outline"
+                    href="{% url 'piloto_eliminar' piloto.pk %}"
+                >
+                    Eliminar
+                </a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
